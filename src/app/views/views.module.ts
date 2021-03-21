@@ -37,33 +37,34 @@ import { NgxSliderModule } from '@m0t0r/ngx-slider';
 import { QueryInterfacesComponent } from './query-interfaces/query-interfaces.component';
 import { EditSourceColumnsComponent } from './schema-editing/edit-source-columns/edit-source-columns.component';
 import {SearchFilterPipe, ValuePipe} from '../pipes/pipes';
+import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 
 
 @NgModule({
-  imports: [
-    //AppModule,
-    CommonModule,
-    ViewsRoutingModule,
-    FormsModule, ReactiveFormsModule,
-    ButtonsModule.forRoot(),
-    CollapseModule,
-    ComponentsModule,
-    TypeaheadModule,
-    // coreui / bootstrap
-    TooltipModule.forRoot(),
-    AppHeaderModule,
-    AppAsideModule,
-    AppSidebarModule,
-    AppFooterModule,
-    TreeModule,
-    BsDropdownModule,
-    DragDropModule,
-    ModalModule.forRoot(),
-    AutocompleteLibModule,
-    ProgressbarModule,
-    PopoverModule,
-    NgxSliderModule
-  ],
+    imports: [
+        //AppModule,
+        CommonModule,
+        ViewsRoutingModule,
+        FormsModule, ReactiveFormsModule,
+        ButtonsModule.forRoot(),
+        CollapseModule,
+        ComponentsModule,
+        TypeaheadModule,
+        // coreui / bootstrap
+        TooltipModule.forRoot(),
+        AppHeaderModule,
+        AppAsideModule,
+        AppSidebarModule,
+        AppFooterModule,
+        TreeModule,
+        BsDropdownModule,
+        DragDropModule,
+        ModalModule.forRoot(),
+        AutocompleteLibModule,
+        ProgressbarModule,
+        PopoverModule,
+        NgxSliderModule, NgbModule
+    ],
   declarations: [
     EditColumnsComponent,
     FormGeneratorComponent,

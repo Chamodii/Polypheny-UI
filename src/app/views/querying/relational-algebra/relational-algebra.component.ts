@@ -1,4 +1,5 @@
 import {AfterViewInit, Component, ElementRef, HostBinding, OnDestroy, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
+// import { NgModule } from '@angular/core';
 import {Connection, LogicalOperator, LogicalOperatorUtil, Node} from './relational-algebra.model';
 import {ResultSet} from '../../../components/data-view/models/result-set.model';
 import {CrudService} from '../../../services/crud.service';
@@ -20,6 +21,17 @@ import {WebuiSettingsService} from '../../../services/webui-settings.service';
 import {Subscription} from 'rxjs';
 import {WebSocket} from '../../../services/webSocket';
 import {UtilService} from '../../../services/util.service';
+import { DndDirective } from './dnd.directive';
+
+import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
+
+
+
+import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
+
+
+
 
 @Component({
   selector: 'app-relational-algebra',
@@ -27,6 +39,10 @@ import {UtilService} from '../../../services/util.service';
   styleUrls: ['./relational-algebra.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
+// @NgModule({
+//   imports:      [ BrowserModule, FormsModule ],
+//   declarations: [DndDirective]
+// })
 export class RelationalAlgebraComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('dropArea', {static: false}) dropArea: ElementRef;
@@ -52,6 +68,8 @@ export class RelationalAlgebraComponent implements OnInit, AfterViewInit, OnDest
   draggingNodeY: number;
   socketOn: boolean;
 
+  closeResult = '';
+
   private lastNode = null;
 
   constructor(
@@ -62,11 +80,84 @@ export class RelationalAlgebraComponent implements OnInit, AfterViewInit, OnDest
     private _leftSidebar: LeftSidebarService,
     private _breadcrumb: BreadcrumbService,
     private _settings:WebuiSettingsService,
-    private _util: UtilService
+    private _util: UtilService,
+    private modalService: NgbModal
   ) {
     this.socketOn = false;
     this.webSocket = new WebSocket(_settings);
     this.initWebsocket();
+  }
+
+  files: any[] = [];
+
+  /**
+   * on file drop handler
+   */
+  onFileDropped($event) {
+    this.prepareFilesList($event);
+  }
+
+  /**
+   * handle file from browsing
+   */
+  fileBrowseHandler(files) {
+    this.prepareFilesList(files);
+  }
+
+  /**
+   * Delete file from files list
+   * @param index (File index)
+   */
+  deleteFile(index: number) {
+    this.files.splice(index, 1);
+  }
+
+  /**
+   * Simulate the upload process
+   */
+  uploadFilesSimulator(index: number) {
+    setTimeout(() => {
+      if (index === this.files.length) {
+        return;
+      } else {
+        const progressInterval = setInterval(() => {
+          if (this.files[index].progress === 100) {
+            clearInterval(progressInterval);
+            this.uploadFilesSimulator(index + 1);
+          } else {
+            this.files[index].progress += 5;
+          }
+        }, 200);
+      }
+    }, 1000);
+  }
+
+  /**
+   * Convert Files list to normal array list
+   * @param files (Files List)
+   */
+  prepareFilesList(files: Array<any>) {
+    for (const item of files) {
+      item.progress = 0;
+      this.files.push(item);
+    }
+    this.uploadFilesSimulator(0);
+  }
+
+  /**
+   * format bytes
+   * @param bytes (File size in bytes)
+   * @param decimals (Decimals point)
+   */
+  formatBytes(bytes, decimals) {
+    if (bytes === 0) {
+      return '0 Bytes';
+    }
+    const k = 1024;
+    const dm = decimals <= 0 ? 0 : decimals || 2;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   }
 
 
@@ -267,6 +358,27 @@ export class RelationalAlgebraComponent implements OnInit, AfterViewInit, OnDest
       });
     }
     this.setAutocomplete();
+  }
+
+  open(content) {
+    // @ts-ignore
+    this.modalService.open(content,
+            {ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult =
+              `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  private getDismissReason(reason: any): string {
+    if (reason === ModalDismissReasons.ESC) {
+      return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+      return 'by clicking on a backdrop';
+    } else {
+      return `with: ${reason}`;
+    }
   }
 
   /**
@@ -590,6 +702,18 @@ export class RelationalAlgebraComponent implements OnInit, AfterViewInit, OnDest
   /**
    * Import a tree in the JSON format
    */
+  add(){
+    if(document.getElementById("query") == null){
+      let row = document.createElement('div');
+      row.className = 'row';
+      row.innerHTML = ` 
+      <br> 
+      <input type="text" id="query">`;
+      document.querySelector('.showInputField').appendChild(row);
+    }
+
+  }
+
   importTree() {
     const input = prompt('Please paste your plan here.');
     if (input === null || input === '') {

@@ -38,6 +38,7 @@ import {ViewsModule} from './views/views.module';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 import { ModalModule } from 'ngx-bootstrap/modal';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   imports:[
@@ -63,7 +64,8 @@ import { ModalModule } from 'ngx-bootstrap/modal';
     HttpClientModule,
     ViewsModule,
     PopoverModule.forRoot(),
-    ModalModule.forRoot()
+    ModalModule.forRoot(),
+    NgbModule
   ],
   declarations: [
     AppComponent,
